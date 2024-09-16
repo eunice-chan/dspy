@@ -10,7 +10,6 @@ from dsp.modules.cache_utils import CacheMemory, NotebookCacheMemory, cache_turn
 from dsp.modules.lm import LM
 from dsp.utils.settings import settings
 
-
 try:
     OPENAI_LEGACY = int(openai.version.__version__[0]) == 0
 except Exception:
@@ -263,7 +262,7 @@ def cached_gpt3_request_v2_wrapped(**kwargs):
 
 
 @CacheMemory.cache
-def _cached_gpt3_turbo_request_v2(**kwargs) -> OpenAIObject:
+def _cached_gpt3_request_v2(**kwargs) -> OpenAIObject:
     if "stringify_request" in kwargs:
         kwargs = json.loads(kwargs["stringify_request"])
     return cast(OpenAIObject, openai.ChatCompletion.create(**kwargs))
@@ -271,23 +270,23 @@ def _cached_gpt3_turbo_request_v2(**kwargs) -> OpenAIObject:
 
 @functools.lru_cache(maxsize=None if cache_turn_on else 0)
 @NotebookCacheMemory.cache
-def _cached_gpt3_turbo_request_v2_wrapped(**kwargs) -> OpenAIObject:
-    return _cached_gpt3_turbo_request_v2(**kwargs)
+def _cached_gpt3_request_v2_wrapped(**kwargs) -> OpenAIObject:
+    return _cached_gpt3_request_v2(**kwargs)
 
 
 def v1_chat_request(client, **kwargs):
     @functools.lru_cache(maxsize=None if cache_turn_on else 0)
     @NotebookCacheMemory.cache
-    def v1_cached_gpt3_turbo_request_v2_wrapped(**kwargs):
+    def v1_cached_gpt3_request_v2_wrapped(**kwargs):
         @CacheMemory.cache
-        def v1_cached_gpt3_turbo_request_v2(**kwargs):
+        def v1_cached_gpt3_request_v2(**kwargs):
             if "stringify_request" in kwargs:
                 kwargs = json.loads(kwargs["stringify_request"])
             return client.chat.completions.create(**kwargs)
 
-        return v1_cached_gpt3_turbo_request_v2(**kwargs)
+        return v1_cached_gpt3_request_v2(**kwargs)
 
-    return v1_cached_gpt3_turbo_request_v2_wrapped(**kwargs).model_dump()
+    return v1_cached_gpt3_request_v2_wrapped(**kwargs).model_dump()
 
 
 def v1_completions_request(client, **kwargs):
@@ -305,7 +304,7 @@ def v1_completions_request(client, **kwargs):
 
 def chat_request(client, **kwargs):
     if OPENAI_LEGACY:
-        return _cached_gpt3_turbo_request_v2_wrapped(**kwargs)
+        return _cached_gpt3_request_v2_wrapped(**kwargs)
 
     return v1_chat_request(client, **kwargs)
 

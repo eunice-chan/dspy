@@ -15,8 +15,8 @@ You can just call the constructor that connects to the LM. Then, use `dspy.confi
 For example, to use OpenAI language models, you can do it as follows.
 
 ```python
-gpt3_turbo = dspy.OpenAI(model='gpt-3.5-turbo-1106', max_tokens=300)
-dspy.configure(lm=gpt3_turbo)
+gpt3 = dspy.OpenAI(model='gpt-3.5-turbo-1106', max_tokens=300)
+dspy.configure(lm=gpt3)
 ```
 
 ## Directly calling the LM.
@@ -24,10 +24,11 @@ dspy.configure(lm=gpt3_turbo)
 You can simply call the LM with a string to give it a raw prompt, i.e. a string.
 
 ```python
-gpt3_turbo("hello! this is a raw prompt to GPT-3.5")
+gpt3("hello! this is a raw prompt to GPT-3.5")
 ```
 
 **Output:**
+
 ```text
 ['Hello! How can I assist you today?']
 ```
@@ -46,14 +47,16 @@ qa = dspy.ChainOfThought('question -> answer')
 response = qa(question="How many floors are in the castle David Gregory inherited?")
 print(response.answer)
 ```
+
 **Output:**
+
 ```text
 The castle David Gregory inherited has 7 floors.
 ```
 
 ## Using multiple LMs at once.
 
-The default LM above is GPT-3.5, `gpt3_turbo`. What if I want to run a piece of code with, say, GPT-4 or LLama-2?
+The default LM above is GPT-3.5, `gpt3`. What if I want to run a piece of code with, say, GPT-4 or LLama-2?
 
 Instead of changing the default LM, you can just change it inside a block of code.
 
@@ -71,7 +74,9 @@ with dspy.context(lm=gpt4_turbo):
     response = qa(question="How many floors are in the castle David Gregory inherited?")
     print('GPT-4-turbo:', response.answer)
 ```
+
 **Output:**
+
 ```text
 GPT-3.5: The castle David Gregory inherited has 7 floors.
 GPT-4-turbo: The number of floors in the castle David Gregory inherited cannot be determined with the information provided.
@@ -92,7 +97,9 @@ qa = dspy.ChainOfThought('question -> answer', n=5)
 response = qa(question="How many floors are in the castle David Gregory inherited?")
 response.completions.answer
 ```
+
 **Output:**
+
 ```text
 ["The specific number of floors in David Gregory's inherited castle is not provided here, so further research would be needed to determine the answer.",
     'The castle David Gregory inherited has 4 floors.',
@@ -112,7 +119,9 @@ for idx in range(5):
     response = qa(question="How many floors are in the castle David Gregory inherited?", config=dict(temperature=0.7+0.0001*idx))
     print(f'{idx+1}.', response.answer)
 ```
+
 **Output:**
+
 ```text
 1. The specific number of floors in David Gregory's inherited castle is not provided here, so further research would be needed to determine the answer.
 2. It is not possible to determine the exact number of floors in the castle David Gregory inherited without specific information about the castle's layout and history.
@@ -135,9 +144,9 @@ lm = dspy.{provider_listed_below}(model="your model", model_request_kwargs="..."
 
 3.  `dspy.Anyscale` for hosted Llama2 models.
 
-4. `dspy.Together` for hosted various open source models.
+4.  `dspy.Together` for hosted various open source models.
 
-5. `dspy.PremAI` for hosted best open source and closed source models.
+5.  `dspy.PremAI` for hosted best open source and closed source models.
 
 ### Local LMs.
 

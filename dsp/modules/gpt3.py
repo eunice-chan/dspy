@@ -4,8 +4,8 @@ import logging
 from typing import Any, Literal, Optional, cast
 
 import backoff
-import openai
 import httpx
+import openai
 
 from dsp.modules.cache_utils import CacheMemory, NotebookCacheMemory, cache_turn_on
 from dsp.modules.lm import LM
@@ -47,17 +47,17 @@ class GPT3(LM):
     """
 
     def __init__(
-            self,
-            model: str = "gpt-3.5-turbo-instruct",
-            api_key: Optional[str] = None,
-            api_provider: Literal["openai"] = "openai",
-            api_base: Optional[str] = None,
-            base_url: Optional[str] = None,
-            model_type: Literal["chat", "text"] = None,
-            system_prompt: Optional[str] = None,
-            http_client: Optional[httpx.Client] = None,
-            default_headers: Optional[dict[str, str]] = None,
-            **kwargs,
+        self,
+        model: str = "gpt-3.5-turbo-instruct",
+        api_key: Optional[str] = None,
+        api_provider: Literal["openai"] = "openai",
+        api_base: Optional[str] = None,
+        base_url: Optional[str] = None,
+        model_type: Literal["chat", "text"] = None,
+        system_prompt: Optional[str] = None,
+        http_client: Optional[httpx.Client] = None,
+        default_headers: Optional[dict[str, str]] = None,
+        **kwargs,
     ):
         super().__init__(model)
         self.provider = "openai"
@@ -67,7 +67,7 @@ class GPT3(LM):
         self.system_prompt = system_prompt
 
         assert (
-                api_provider != "azure"
+            api_provider != "azure"
         ), "Azure functionality with base OpenAI has been deprecated, please use dspy.AzureOpenAI instead."
 
         default_model_type = (
@@ -157,11 +157,11 @@ class GPT3(LM):
         return choice["text"]
 
     def __call__(
-            self,
-            prompt: str,
-            only_completed: bool = True,
-            return_sorted: bool = False,
-            **kwargs,
+        self,
+        prompt: str,
+        only_completed: bool = True,
+        return_sorted: bool = False,
+        **kwargs,
     ) -> list[dict[str, Any]]:
         """Retrieves completions from GPT-3.
 
@@ -194,7 +194,7 @@ class GPT3(LM):
             choices = completed_choices
 
         if kwargs.get("logprobs", False):
-            completions = [{'text': self._get_choice_text(c), 'logprobs': c["logprobs"]} for c in choices]
+            completions = [{"text": self._get_choice_text(c), "logprobs": c["logprobs"]} for c in choices]
         else:
             completions = [self._get_choice_text(c) for c in choices]
 
@@ -215,7 +215,7 @@ class GPT3(LM):
                 scored_completions.append((avglog, self._get_choice_text(c), logprobs))
             scored_completions = sorted(scored_completions, reverse=True)
             if logprobs:
-                completions = [{'text': c, 'logprobs': lp} for _, c, lp in scored_completions]
+                completions = [{"text": c, "logprobs": lp} for _, c, lp in scored_completions]
             else:
                 completions = [c for _, c in scored_completions]
 
@@ -234,7 +234,7 @@ def cached_gpt3_request_v2_wrapped(**kwargs):
 
 
 @CacheMemory.cache
-def _cached_gpt3_turbo_request_v2(**kwargs) -> OpenAIObject:
+def _cached_gpt3_request_v2(**kwargs) -> OpenAIObject:
     if "stringify_request" in kwargs:
         kwargs = json.loads(kwargs["stringify_request"])
     return cast(OpenAIObject, openai.ChatCompletion.create(**kwargs))
@@ -242,8 +242,8 @@ def _cached_gpt3_turbo_request_v2(**kwargs) -> OpenAIObject:
 
 @functools.lru_cache(maxsize=None if cache_turn_on else 0)
 @NotebookCacheMemory.cache
-def _cached_gpt3_turbo_request_v2_wrapped(**kwargs) -> OpenAIObject:
-    return _cached_gpt3_turbo_request_v2(**kwargs)
+def _cached_gpt3_request_v2_wrapped(**kwargs) -> OpenAIObject:
+    return _cached_gpt3_request_v2(**kwargs)
 
 
 @CacheMemory.cache
@@ -258,7 +258,7 @@ def v1_cached_gpt3_request_v2_wrapped(**kwargs):
 
 
 @CacheMemory.cache
-def v1_cached_gpt3_turbo_request_v2(**kwargs):
+def v1_cached_gpt3_request_v2(**kwargs):
     if "stringify_request" in kwargs:
         kwargs = json.loads(kwargs["stringify_request"])
     return openai.chat.completions.create(**kwargs)
@@ -266,15 +266,15 @@ def v1_cached_gpt3_turbo_request_v2(**kwargs):
 
 @functools.lru_cache(maxsize=None if cache_turn_on else 0)
 @NotebookCacheMemory.cache
-def v1_cached_gpt3_turbo_request_v2_wrapped(**kwargs):
-    return v1_cached_gpt3_turbo_request_v2(**kwargs)
+def v1_cached_gpt3_request_v2_wrapped(**kwargs):
+    return v1_cached_gpt3_request_v2(**kwargs)
 
 
 def chat_request(**kwargs):
     if OPENAI_LEGACY:
-        return _cached_gpt3_turbo_request_v2_wrapped(**kwargs)
+        return _cached_gpt3_request_v2_wrapped(**kwargs)
 
-    return v1_cached_gpt3_turbo_request_v2_wrapped(**kwargs).model_dump()
+    return v1_cached_gpt3_request_v2_wrapped(**kwargs).model_dump()
 
 
 def completions_request(**kwargs):
