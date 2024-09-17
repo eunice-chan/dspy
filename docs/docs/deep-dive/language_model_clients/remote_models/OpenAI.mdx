@@ -19,7 +19,7 @@ The constructor initializes the base class `LM` to support prompting requests to
 Example of the OpenAI constructor:
 
 ```python
-class GPT3(LM): #This is a wrapper for the OpenAI class - dspy.OpenAI = dsp.GPT3
+class GPT3(LM): # This is a wrapper for the OpenAI class - dspy.OpenAI = dsp.GPT3
     def __init__(
         self,
         model: str = "gpt-3.5-turbo-instruct",
@@ -52,7 +52,7 @@ After generation, the completions are post-processed based on the `model_type` p
 ### Using the OpenAI client
 
 ```python
-turbo = dspy.OpenAI(model='gpt-3.5-turbo')
+gpt3 = dspy.OpenAI(model='gpt-3.5-turbo')
 ```
 
 ### Sending Requests via OpenAI Client
@@ -62,19 +62,19 @@ turbo = dspy.OpenAI(model='gpt-3.5-turbo')
 This allows you to define programs in DSPy and simply call modules on your input fields, having DSPy internally call the prompt on the configured LM.
 
 ```python
-dspy.configure(lm=turbo)
+dspy.configure(lm=gpt3)
 
-#Example DSPy CoT QA program
+# Example DSPy CoT QA program
 qa = dspy.ChainOfThought('question -> answer')
 
-response = qa(question="What is the capital of Paris?") #Prompted to turbo
+response = qa(question="What is the capital of Paris?") # Prompted to gpt3
 print(response.answer)
 ```
 
 2) Generate responses using the client directly.
 
 ```python
-response = turbo(prompt='What is the capital of Paris?')
+response = gpt3(prompt='What is the capital of Paris?')
 print(response)
 ```
 
