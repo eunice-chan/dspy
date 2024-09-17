@@ -7,7 +7,7 @@ sidebar_position: 1
 ### Usage
 
 ```python
-lm = dspy.OpenAI(model='gpt-3.5-turbo')
+lm = dspy.OpenAI(model='gpt-3.5')
 ```
 
 ### Constructor
