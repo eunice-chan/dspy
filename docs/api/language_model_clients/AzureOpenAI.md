@@ -7,7 +7,7 @@ sidebar_position: 2
 ### Usage
 
 ```python
-lm = dspy.AzureOpenAI(api_base='...', api_version='2023-12-01-preview', model='gpt-3.5-turbo')
+lm = dspy.AzureOpenAI(api_base='...', api_version='2023-12-01-preview', model='gpt-3.5')
 ```
 
 ### Constructor
@@ -22,7 +22,7 @@ class AzureOpenAI(LM):
         self,
         api_base: str,
         api_version: str,
-        model: str = "gpt-3.5-turbo-instruct",
+        model: str = "gpt-3.5-instruct",
         api_key: Optional[str] = None,
         model_type: Literal["chat", "text"] = None,
         **kwargs,
