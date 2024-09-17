@@ -13,8 +13,8 @@ So far we've understood what signatures are and how we can use them to craft our
 To execute signatures, we require DSPy modules which are themselves dependent on a client connection to a language model (LM) client. DSPy supports LM APIs and local model hosting. Within this example, we will make use of the OpenAI client and configure the GPT-3.5 (`gpt-3.5-turbo`) model.
 
 ```python
-turbo = dspy.OpenAI(model='gpt-3.5-turbo')
-dspy.settings.configure(lm=turbo)
+gpt3 = dspy.OpenAI(model='gpt-3.5')
+dspy.settings.configure(lm=gpt3)
 ```
 
 ## Executing Signatures
