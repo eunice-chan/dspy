@@ -15,8 +15,8 @@ You can just call the constructor that connects to the LM. Then, use `dspy.confi
 For example, to use OpenAI language models, you can do it as follows.
 
 ```python
-gpt3_turbo = dspy.OpenAI(model='gpt-3.5-turbo-1106', max_tokens=300)
-dspy.configure(lm=gpt3_turbo)
+gpt3 = dspy.OpenAI(model='gpt-3.5-turbo-1106', max_tokens=300)
+dspy.configure(lm=gpt3)
 ```
 
 ## Directly calling the LM.
@@ -24,7 +24,7 @@ dspy.configure(lm=gpt3_turbo)
 You can simply call the LM with a string to give it a raw prompt, i.e. a string.
 
 ```python
-gpt3_turbo("hello! this is a raw prompt to GPT-3.5")
+gpt3("hello! this is a raw prompt to GPT-3.5")
 ```
 
 **Output:**
@@ -53,7 +53,7 @@ The castle David Gregory inherited has 7 floors.
 
 ## Using multiple LMs at once.
 
-The default LM above is GPT-3.5, `gpt3_turbo`. What if I want to run a piece of code with, say, GPT-4 or LLama-2?
+The default LM above is GPT-3.5, `gpt3`. What if I want to run a piece of code with, say, GPT-4 or LLama-2?
 
 Instead of changing the default LM, you can just change it inside a block of code.
 
