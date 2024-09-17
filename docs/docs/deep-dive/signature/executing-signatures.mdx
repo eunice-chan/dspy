@@ -1,5 +1,4 @@
----
-sidebar_position: 2
+_position: 2
 ---
 
 import AuthorDetails from '@site/src/components/AuthorDetails';
@@ -13,8 +12,8 @@ So far we've understood what signatures are and how we can use them to craft our
 To execute signatures, we require DSPy modules which are themselves dependent on a client connection to a language model (LM) client. DSPy supports LM APIs and local model hosting. Within this example, we will make use of the OpenAI client and configure the GPT-3.5 (`gpt-3.5-turbo`) model.
 
 ```python
-turbo = dspy.OpenAI(model='gpt-3.5-turbo')
-dspy.settings.configure(lm=turbo)
+gpt3 = dspy.OpenAI(model='gpt-3.5-turbo')
+dspy.settings.configure(lm=gpt3)
 ```
 
 ## Executing Signatures
@@ -53,7 +52,7 @@ The `Predict` module generates a response via the LM we configured above and exe
 Let's dive deeper into DSPy uses our signature to build up the prompt, which we can do through the `inspect_history` method on the configured LM following the program's execution. This method returns the last `n` prompts executed by LM.
 
 ```python
-turbo.inspect_history(n=1)
+gpt3.inspect_history(n=1)
 ```
 **Output:**
 ```text
@@ -75,7 +74,7 @@ Answer: No.
 Additionally, if you want to store or use this prompt, you can access the `history` attribute of the LM object, which stores a list of dictionaries containing respective  `prompt:response` entries for each LM generation.
 
 ```python
-turbo.history[0]
+gpt3.history[0]
 ```
 **Output:**
 ```text
@@ -109,20 +108,4 @@ turbo.history[0]
 
 ## How `Predict` works?
 
-The output of predictor is a `Prediction` class object which mirrors the `Example` class with additional functionalities for LM completion interactivity. 
-
-How does `Predict` module actually 'predict' though? Here is a step-by-step breakdown:
-
-1. A call to the predictor will get executed in `__call__` method of `Predict` Module which executes the `forward` method of the class.
-
-2. In `forward` method, DSPy initializes the signature, LM call parameters and few-shot examples, if any.
-
-3. The `_generate` method formats the few shots example to mirror the signature and uses the LM object we configured to generate the output as a `Prediction` object. 
-
-In case you are wondering how the prompt is constructed, the DSPy Signature framework internally handles the prompt structure, utilizing the DSP Template primitive to craft the prompt. 
-
-Predict gives you a predefined pipeline to execute signature which is nice but you can build much more complicated pipelines with this by creating custom Modules.
-
-***
-
-<AuthorDetails name="Herumb Shandilya"/>
+The output of predictor is a `Prediction` class object which mirrors the `Example` class wit
