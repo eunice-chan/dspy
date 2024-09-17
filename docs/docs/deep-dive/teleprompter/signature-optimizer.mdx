@@ -1,5 +1,4 @@
----
-sidebar_position: 2
+_position: 2
 ---
 
 import AuthorDetails from '@site/src/components/AuthorDetails';
@@ -15,8 +14,8 @@ We'll be creating our CoT pipeline from scratch including the metric itself! So 
 ```python
 import dspy
 
-turbo = dspy.OpenAI(model='gpt-3.5-turbo')
-dspy.settings.configure(lm=turbo)
+gpt3 = dspy.OpenAI(model='gpt-3.5-turbo')
+dspy.settings.configure(lm=gpt3)
 ```
 
 Now that we have the LM client setup it's time to import the train-dev split in `HotPotQA` class that DSPy provides us:
@@ -98,70 +97,4 @@ kwargs = dict(num_threads=64, display_progress=True, display_table=0) # Used in 
 compiled_prompt_opt = teleprompter.compile(cot, trainset=devset, eval_kwargs=kwargs)
 ```
 
-Once the training is done you'll have better instructions and prefixes that you'll need to edit in signature manually. So let's say the output during optimization is like:
-
-```text
-i: "Please answer the question and provide your reasoning for the answer. Your response should be clear and detailed, explaining the rationale behind your decision. Please ensure that your answer is well-reasoned and supported by relevant explanations and examples."
-p: "[Rationale]"
-Average Metric (78.9) ...
-```
-
-Then you'll copy this and edit the original instruction class to:
-
-```python
-class CoTSignature(dspy.Signature):
-    """Please answer the question and provide your reasoning for the answer. Your response should be clear and detailed, explaining the rationale behind your decision. Please ensure that your answer is well-reasoned and supported by relevant explanations and examples."""
-
-    question = dspy.InputField(desc="question about something")
-    reasoning = dspy.OutputField(desc="reasoning for the answer", prefix="[Rationale]")
-    answer = dspy.OutputField(desc="often between 1 and 5 words")
-```
-
-:::info
-The prefix would be proposed only for the output field that is defined first i.e. reasoning in `CoTSignature`.
-:::
-
-Reinitialize the Pipeline object and reevaluate the pipeline! And now you have a more powerful predictor with more optimized Signature!
-
-## How `COPRO` works?
-
-It is interesting that to get optimal prefixes and instruction, `COPRO` uses Signatures. Basically `COPRO` uses Signature to optimize Signature!! Let's look at the codebase a bit more closely:
-
-```python
-class BasicGenerateInstruction(Signature):
-    """You are an instruction optimizer for large language models. I will give you a ``signature`` of fields (inputs and outputs) in English. Your task is to propose an instruction that will lead a good language model to perform the task well. Don't be afraid to be creative."""
-
-    basic_instruction = dspy.InputField(desc="The initial instructions before optimization")
-    proposed_instruction = dspy.OutputField(desc="The improved instructions for the language model")
-    proposed_prefix_for_output_field = dspy.OutputField(desc="The string at the end of the prompt, which will help the model start solving the task")
-
-class GenerateInstructionGivenAttempts(dspy.Signature):
-    """You are an instruction optimizer for large language models. I will give some task instructions I've tried, along with their corresponding validation scores. The instructions are arranged in increasing order based on their scores, where higher scores indicate better quality.
-
-Your task is to propose a new instruction that will lead a good language model to perform the task even better. Don't be afraid to be creative."""
-
-    attempted_instructions = dspy.InputField(format=dsp.passages2text)
-    proposed_instruction = dspy.OutputField(desc="The improved instructions for the language model")
-    proposed_prefix_for_output_field = dspy.OutputField(desc="The string at the end of the prompt, which will help the model start solving the task")
-```
-
-These two signatures are what give use the optimal instruction and prefixes. Now, the `BasicGenerateInstruction` will generate `n` instruction and prefixes based on the `breadth` parameter, basically `n=breadth`. This happens only one time in the start to seed the instruction attempts.
-
-It uses these instructions and pass them to `GenerateInstructionGivenAttempts` which outputs hopefully a more optimal instruction. This then happens for `m` iterations which is the `depth` parameter in DSPy.
-
-![Signature Optimizer](./img/signature_optimizer_process_v4.png)
-
-Let's break down the process stepwise:
-
-1. **Starting Point:** Use BasicGenerateInstruction to create initial optimized instructions and prefixes. This is based on a basic instruction input.
-2. **Iterative Improvement:** Pass these initial instructions to GenerateInstructionGivenAttempts.
-3. **Repeat Optimization:** In each iteration (up to m times):
-    - Evaluate the current instructions and their effectiveness.
-    - Propose new, more optimized instructions and prefixes based on the evaluation.
-4. **Outcome:** After m iterations, the system ideally converges to a set of highly optimized instructions and corresponding prefixes that lead to better performance of the language model on the given task.
-
-This iterative approach allows for continuous refinement of instructions and prefixes, leveraging the strengths of the teleprompter and improving task performance over time.
-
-***
-
-<AuthorDetails name="Herumb Shandilya"/>
+Once the training is done you'll have better i
